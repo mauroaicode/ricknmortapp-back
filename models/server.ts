@@ -35,14 +35,25 @@ class Server{
 
     middlewares(){
         //CORS
-        // this.app.use(cors());
-        this.app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-            res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-            res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-            next();
-        });
+        const whiteList = [process.env.URL_FRONT]
+        const corsOptions = {
+            origin: (origin:any, callback:any) =>{
+                const exist = whiteList.some(domain => domain === origin)
+                if (exist){
+                    callback(null, true)
+                }else{
+                    callback(new Error('No permitido por CORS'))
+                }
+            }
+        }
+        this.app.use(cors(corsOptions));
+        // this.app.use((req, res, next) => {
+        //     res.header('Access-Control-Allow-Origin', '*');
+        //     res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+        //     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+        //     res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+        //     next();
+        // });
 
         //BODY
         this.app.use(express.json());
